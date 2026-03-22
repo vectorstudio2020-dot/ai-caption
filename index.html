@@ -1,102 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<title>M4A to MP3 Converter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Free Audio Converter - M4A MP4 WAV to MP3</title>
+
+<meta name="description" content="Free online audio converter. Convert M4A, MP4, WAV to MP3 instantly. Fast and secure.">
+
 <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 
-
 <style>
+
 body{
 font-family:Arial;
 background:#0f172a;
 color:white;
-text-align:center;
-padding:40px;
+margin:0;
 }
 
-.box{
-background:#1e293b;
-padding:30px;
-border-radius:10px;
+header{
+display:flex;
+justify-content:space-between;
+padding:20px 40px;
+background:#020617;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+}
+
+nav a{
+color:white;
+margin:0 15px;
+text-decoration:none;
+}
+
+.hero{
+text-align:center;
+padding:80px 20px;
+}
+
+.upload-box{
+border:2px dashed #475569;
+padding:40px;
+margin:30px auto;
 max-width:500px;
-margin:auto;
+border-radius:10px;
 }
 
 button{
-padding:10px 20px;
-border:none;
+padding:14px 28px;
 background:#22c55e;
+border:none;
+border-radius:8px;
 color:white;
-border-radius:6px;
+font-size:16px;
 cursor:pointer;
-margin-top:10px;
 }
+
+button:hover{
+background:#16a34a;
+}
+
+.progress{
+width:100%;
+height:12px;
+background:#334155;
+border-radius:20px;
+margin-top:20px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#22c55e;
+}
+
+section{
+max-width:900px;
+margin:auto;
+padding:40px 20px;
+}
+
+footer{
+text-align:center;
+padding:30px;
+background:#020617;
+margin-top:50px;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<div class="box">
+<header>
 
-<h2>M4A → MP3 Converter</h2>
+<div class="logo">AudioConverter</div>
 
-<input type="file" id="fileInput" accept=".m4a">
+<nav>
+<a href="#">Audio</a>
+<a href="#">Video</a>
+<a href="#">Image</a>
+</nav>
 
-<br>
+</header>
+
+<section class="hero">
+
+<h1>Convert Audio to MP3 Online</h1>
+
+<p>M4A • MP4 • WAV → MP3 Converter</p>
+
+<div class="upload-box">
+
+<input type="file" id="fileInput">
+
+<br><br>
 
 <button onclick="convert()">Convert to MP3</button>
 
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
 <p id="status"></p>
 
-<a id="download" style="display:none">
+<a id="downloadLink" style="display:none;">
 <button>Download MP3</button>
 </a>
 
 </div>
 
+</section>
+
+<section>
+
+<h2>Supported Formats</h2>
+
+<ul>
+<li>M4A → MP3</li>
+<li>MP4 → MP3</li>
+<li>WAV → MP3</li>
+<li>AAC → MP3</li>
+<li>FLAC → MP3</li>
+</ul>
+
+<h2>Free Online Audio Converter</h2>
+
+<p>
+This tool lets you convert audio files online for free.
+Supports M4A, MP4 and WAV to MP3 conversion instantly.
+Works on mobile, tablet and desktop.
+</p>
+
+</section>
+
+<footer>
+
+<p>© 2026 AudioConverter</p>
+
+</footer>
+
 <script>
 
 const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ log: true });
+
+const ffmpeg = createFFmpeg({ log:true });
 
 async function convert(){
 
+const file=document.getElementById("fileInput").files[0];
+const bar=document.getElementById("bar");
 const status=document.getElementById("status");
-const fileInput=document.getElementById("fileInput").files[0];
 
-if(!fileInput){
-alert("Upload M4A file first");
+if(!file){
+alert("Upload file first");
 return;
 }
 
-status.innerText="Loading converter...";
-
 if(!ffmpeg.isLoaded()){
+status.innerText="Loading converter...";
 await ffmpeg.load();
 }
 
+bar.style.width="40%";
+
+ffmpeg.FS('writeFile',file.name,await fetchFile(file));
+
 status.innerText="Converting...";
 
-ffmpeg.FS('writeFile','input.m4a',await fetchFile(fileInput));
+await ffmpeg.run('-i',file.name,'output.mp3');
 
-await ffmpeg.run('-i','input.m4a','output.mp3');
+bar.style.width="90%";
 
 const data=ffmpeg.FS('readFile','output.mp3');
 
 const url=URL.createObjectURL(new Blob([data.buffer],{type:'audio/mp3'}));
 
-const download=document.getElementById("download");
-download.href=url;
-download.download="converted.mp3";
-download.style.display="block";
+const link=document.getElementById("downloadLink");
 
-status.innerText="Done ✅";
+link.href=url;
+link.download="converted.mp3";
+
+link.style.display="block";
+
+bar.style.width="100%";
+
+status.innerText="Done";
 
 }
 
 </script>
 
 </body>
+
 </html>
