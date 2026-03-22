@@ -1,122 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
+
 <meta charset="UTF-8">
-<title>Audio Converter | M4A MP4 WAV to MP3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+<title>ตรวจหวยรัฐบาลล่าสุด</title>
 
-<style>
-
-body{
-font-family:Arial;
-background:#0f172a;
-color:white;
-text-align:center;
-padding-top:80px;
-}
-
-button{
-padding:12px 25px;
-background:#22c55e;
-border:none;
-border-radius:8px;
-color:white;
-font-size:16px;
-cursor:pointer;
-}
-
-.progress{
-width:320px;
-height:12px;
-background:#334155;
-margin:20px auto;
-border-radius:20px;
-overflow:hidden;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:#22c55e;
-transition:0.3s;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<h1>Audio Converter</h1>
-<p>M4A / MP4 / WAV → MP3</p>
+<header>
+<h1>ตรวจหวยรัฐบาล</h1>
+<p>ผลสลากกินแบ่งรัฐบาลล่าสุด</p>
+</header>
 
-<input type="file" id="file">
+<div class="container">
 
-<br><br>
+<div class="card">
 
-<button onclick="convert()">Convert to MP3</button>
+<h2>งวดล่าสุด</h2>
 
-<div class="progress">
-<div class="bar" id="bar"></div>
+<p id="date">Loading...</p>
+
+<div class="grid">
+
+<div>
+<p>รางวัลที่ 1</p>
+<h3 id="first"></h3>
 </div>
 
-<p id="status"></p>
+<div>
+<p>เลขหน้า 3 ตัว</p>
+<h3 id="front"></h3>
+</div>
 
-<script>
+<div>
+<p>เลขท้าย 3 ตัว</p>
+<h3 id="back"></h3>
+</div>
 
-const { createFFmpeg, fetchFile } = FFmpeg;
+<div>
+<p>เลขท้าย 2 ตัว</p>
+<h3 id="last"></h3>
+</div>
 
-const ffmpeg = createFFmpeg({
-log:true,
-corePath:"https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js"
-});
+</div>
 
-async function convert(){
+</div>
 
-const fileInput = document.getElementById("file").files[0];
-const bar = document.getElementById("bar");
-const status = document.getElementById("status");
+<div class="card">
 
-if(!fileInput){
-alert("Upload file first");
-return;
-}
+<h2>ตรวจหวย</h2>
 
-status.innerText="Loading engine...";
+<input id="checkNumber" placeholder="ใส่เลข 6 หลัก">
 
-if(!ffmpeg.isLoaded()){
-await ffmpeg.load();
-}
+<button onclick="check()">ตรวจผล</button>
 
-bar.style.width="40%";
+<p id="result"></p>
 
-ffmpeg.FS("writeFile", fileInput.name, await fetchFile(fileInput));
+</div>
 
-status.innerText="Converting...";
+</div>
 
-await ffmpeg.run("-i", fileInput.name, "output.mp3");
-
-bar.style.width="90%";
-
-const data = ffmpeg.FS("readFile", "output.mp3");
-
-const url = URL.createObjectURL(
-new Blob([data.buffer], {type:"audio/mp3"})
-);
-
-const a=document.createElement("a");
-a.href=url;
-a.download="converted.mp3";
-a.click();
-
-bar.style.width="100%";
-
-status.innerText="Done ✅";
-
-}
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
