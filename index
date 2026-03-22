@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>M4A MP4 WAV to MP3 Converter</title>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+padding-top:80px;
+}
+
+button{
+padding:12px 25px;
+background:#22c55e;
+border:none;
+border-radius:8px;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+.progress{
+width:300px;
+height:10px;
+background:#334155;
+margin:20px auto;
+border-radius:20px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:#22c55e;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Audio Converter</h1>
+
+<p>M4A / MP4 / WAV → MP3</p>
+
+<input type="file" id="file">
+
+<br><br>
+
+<button onclick="convert()">Convert</button>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<p id="status"></p>
+
+<script>
+
+async function convert(){
+
+const fileInput=document.getElementById("file").files[0];
+
+if(!fileInput){
+alert("Upload file first");
+return;
+}
+
+const bar=document.getElementById("bar");
+const status=document.getElementById("status");
+
+const { createFFmpeg, fetchFile } = FFmpeg;
+
+const ffmpeg = createFFmpeg({
+log:true,
+corePath:"https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js"
+});
+
+status.innerText="Loading converter...";
+
+await ffmpeg.load();
+
+bar.style.width="40%";
+
+ffmpeg.FS('writeFile', fileInput.name, await fetchFile(fileInput));
+
+status.innerText="Converting...";
+
+await ffmpeg.run('-i', fileInput.name, 'output.mp3');
+
+bar.style.width="90%";
+
+const data = ffmpeg.FS('readFile', 'output.mp3');
+
+const url = URL.createObjectURL(
+new Blob([data.buffer], { type: 'audio/mp3' })
+);
+
+const a=document.createElement("a");
+a.href=url;
+a.download="converted.mp3";
+a.click();
+
+bar.style.width="100%";
+status.innerText="Done";
+
+}
+
+</script>
+
+</body>
+</html>
