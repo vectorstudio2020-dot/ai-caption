@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Caption Generator</title>
+
+<style>
+
+body{
+font-family: Arial;
+background: linear-gradient(135deg,#6a11cb,#2575fc);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:15px;
+width:400px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+h2{
+text-align:center;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+margin-top:15px;
+padding:10px;
+width:100%;
+border:none;
+border-radius:8px;
+background:#2575fc;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+.caption{
+background:#f5f5f5;
+padding:10px;
+border-radius:8px;
+margin-top:10px;
+position:relative;
+}
+
+.copy{
+position:absolute;
+right:10px;
+top:10px;
+font-size:12px;
+cursor:pointer;
+color:#2575fc;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>AI Caption Generator</h2>
+
+<input id="topic" placeholder="พิมพ์หัวข้อโพสต์">
+
+<select id="platform">
+<option>Facebook</option>
+<option>Instagram</option>
+<option>TikTok</option>
+</select>
+
+<button onclick="generate()">Generate Caption</button>
+
+<div id="results"></div>
+
+</div>
+
+<script>
+
+function generate(){
+
+let topic=document.getElementById("topic").value;
+let platform=document.getElementById("platform").value;
+
+let results=document.getElementById("results");
+results.innerHTML="";
+
+let captions=[];
+
+for(let i=1;i<=5;i++){
+
+let caption=
+"✨ "+topic+" ที่กำลังมาแรงบน "+platform+"!\n"+
+"ห้ามพลาดเด็ดขาด 🔥\n\n"+
+"#"+topic+" #Trending #"+platform;
+
+captions.push(caption);
+
+}
+
+captions.forEach(c=>{
+
+let div=document.createElement("div");
+div.className="caption";
+
+div.innerHTML=`
+<span class="copy" onclick="copyText(this)">Copy</span>
+<pre>${c}</pre>
+`;
+
+results.appendChild(div);
+
+});
+
+}
+
+function copyText(el){
+
+let text=el.parentElement.innerText.replace("Copy","");
+navigator.clipboard.writeText(text);
+
+el.innerText="Copied!";
+
+setTimeout(()=>{el.innerText="Copy"},1500);
+
+}
+
+</script>
+
+</body>
+</html>
