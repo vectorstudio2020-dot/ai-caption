@@ -1,141 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Caption Generator</title>
- 
+<title>M4A to MP3 Converter</title>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+
 <style>
-
 body{
-font-family: Arial;
-background: linear-gradient(135deg,#6a11cb,#2575fc);
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
-}
-
-.container{
-background:white;
-padding:30px;
-border-radius:15px;
-width:400px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-h2{
+font-family:Arial;
+background:#0f172a;
+color:white;
 text-align:center;
+padding:40px;
 }
 
-input,select{
-width:100%;
-padding:10px;
-margin-top:10px;
-border-radius:8px;
-border:1px solid #ccc;
+.box{
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+max-width:500px;
+margin:auto;
 }
 
 button{
-margin-top:15px;
-padding:10px;
-width:100%;
+padding:10px 20px;
 border:none;
-border-radius:8px;
-background:#2575fc;
+background:#22c55e;
 color:white;
-font-size:16px;
+border-radius:6px;
 cursor:pointer;
-}
-
-.caption{
-background:#f5f5f5;
-padding:10px;
-border-radius:8px;
 margin-top:10px;
-position:relative;
 }
-
-.copy{
-position:absolute;
-right:10px;
-top:10px;
-font-size:12px;
-cursor:pointer;
-color:#2575fc;
-}
-
 </style>
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
-<h2>AI Caption Generator</h2>
+<h2>M4A → MP3 Converter</h2>
 
-<input id="topic" placeholder="พิมพ์หัวข้อโพสต์">
+<input type="file" id="fileInput" accept=".m4a">
 
-<select id="platform">
-<option>Facebook</option>
-<option>Instagram</option>
-<option>TikTok</option>
-</select>
+<br>
 
-<button onclick="generate()">Generate Caption</button>
+<button onclick="convert()">Convert to MP3</button>
 
-<div id="results"></div>
+<p id="status"></p>
+
+<a id="download" style="display:none">
+<button>Download MP3</button>
+</a>
 
 </div>
 
 <script>
 
-function generate(){
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log: true });
 
-let topic=document.getElementById("topic").value;
-let platform=document.getElementById("platform").value;
+async function convert(){
 
-let results=document.getElementById("results");
-results.innerHTML="";
+const status=document.getElementById("status");
+const fileInput=document.getElementById("fileInput").files[0];
 
-let captions=[];
-
-for(let i=1;i<=5;i++){
-
-let caption=
-"✨ "+topic+" ที่กำลังมาแรงบน "+platform+"!\n"+
-"ห้ามพลาดเด็ดขาด 🔥\n\n"+
-"#"+topic+" #Trending #"+platform;
-
-captions.push(caption);
-
+if(!fileInput){
+alert("Upload M4A file first");
+return;
 }
 
-captions.forEach(c=>{
+status.innerText="Loading converter...";
 
-let div=document.createElement("div");
-div.className="caption";
-
-div.innerHTML=`
-<span class="copy" onclick="copyText(this)">Copy</span>
-<pre>${c}</pre>
-`;
-
-results.appendChild(div);
-
-});
-
+if(!ffmpeg.isLoaded()){
+await ffmpeg.load();
 }
 
-function copyText(el){
+status.innerText="Converting...";
 
-let text=el.parentElement.innerText.replace("Copy","");
-navigator.clipboard.writeText(text);
+ffmpeg.FS('writeFile','input.m4a',await fetchFile(fileInput));
 
-el.innerText="Copied!";
+await ffmpeg.run('-i','input.m4a','output.mp3');
 
-setTimeout(()=>{el.innerText="Copy"},1500);
+const data=ffmpeg.FS('readFile','output.mp3');
+
+const url=URL.createObjectURL(new Blob([data.buffer],{type:'audio/mp3'}));
+
+const download=document.getElementById("download");
+download.href=url;
+download.download="converted.mp3";
+download.style.display="block";
+
+status.innerText="Done ✅";
 
 }
 
